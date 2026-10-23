@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#fff8f5">
+  <title>Um carinho por dia ❤️</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #49323a;
+      --muted: #9b7d83;
+      --rose: #c45b75;
+      --rose-dark: #a84360;
+      --rose-light: #f9e7eb;
+      --paper: #fffdfb;
+      --line: #f0e4e1;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 36px 18px;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(ellipse at 12% 12%, #fbe7e9 0, transparent 32%),
+        radial-gradient(ellipse at 88% 88%, #f8e9df 0, transparent 30%),
+        #fff8f5;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .page {
+      width: min(100%, 540px);
+    }
+
+    .intro {
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--rose);
+      font-family: Arial, sans-serif;
+      font-size: 0.73rem;
+      font-weight: 700;
+      letter-spacing: 0.17em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 8vw, 3rem);
+      font-weight: 500;
+      letter-spacing: -0.045em;
+    }
+
+    .subtitle {
+      margin: 12px auto 0;
+      color: var(--muted);
+      font-family: Arial, sans-serif;
+      font-size: 0.96rem;
+      line-height: 1.6;
+    }
+
+    .calendar {
+      overflow: hidden;
+      padding: clamp(20px, 6vw, 34px);
+      border: 1px solid #f3e7e3;
+      border-radius: 24px;
+      background: rgb(255 253 251 / 94%);
+      box-shadow: 0 18px 55px rgb(105 62 70 / 10%);
+    }
+
+    .month-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .month-nav h2 {
+      margin: 0;
+      font-size: 1.35rem;
+      font-weight: 500;
+      text-align: center;
+      text-transform: capitalize;
+    }
+
+    .nav-button,
+    .day {
+      display: grid;
+      place-items: center;
+      border: 0;
+      cursor: pointer;
+    }
+
+    .nav-button {
+      width: 38px;
+      height: 38px;
+      flex: 0 0 38px;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--rose-dark);
+      font-family: Arial, sans-serif;
+      font-size: 1.45rem;
+      transition: background 160ms ease, transform 160ms ease;
+    }
+
+    .nav-button:hover:not(:disabled) {
+      transform: scale(1.06);
+      background: var(--rose-light);
+    }
+
+    .nav-button:disabled {
+      cursor: default;
+      opacity: 0.28;
+    }
+
+    .weekdays,
+    .days {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 7px;
+    }
+
+    .weekdays {
+      margin-bottom: 10px;
+    }
+
+    .weekdays span {
+      color: var(--muted);
+      font-family: Arial, sans-serif;
+      font-size: 0.73rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .day,
+    .empty-day {
+      aspect-ratio: 1;
+      min-width: 0;
+    }
+
+    .day {
+      position: relative;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--ink);
+      font-family: Arial, sans-serif;
+      font-size: 0.93rem;
+      transition: transform 150ms ease, background 150ms ease, color 150ms ease;
+    }
+
+    .day.available::after {
+      position: absolute;
+      bottom: 11%;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #df8a9c;
+      content: "";
+    }
+
+    .day.available:hover {
+      transform: translateY(-2px);
+      background: var(--rose-light);
+    }
+
+    .day.selected {
+      background: var(--rose);
+      color: white;
+      box-shadow: 0 5px 13px rgb(196 91 117 / 25%);
+    }
+
+    .day.selected::after {
+      background: white;
+    }
+
+    .travel-indicator {
+      position: absolute;
+      top: 1px;
+      right: 0;
+      display: grid;
+      width: 16px;
+      height: 16px;
+      place-items: center;
+      border: 1px solid #f5d8df;
+      border-radius: 50%;
+      background: #fff8f5;
+      color: var(--rose-dark);
+      font-family: Arial, sans-serif;
+      font-size: 0.69rem;
+      line-height: 1;
+    }
+
+    .day.selected .travel-indicator {
+      border-color: white;
+      background: white;
+    }
+
+    .day:focus-visible,
+    .nav-button:focus-visible,
+    .close-button:focus-visible {
+      outline: 3px solid #e7a2b0;
+      outline-offset: 3px;
+    }
+
+    .day:disabled {
+      cursor: default;
+      color: #d8ccca;
+    }
+
+    .hint {
+      margin: 20px 0 0;
+      color: var(--muted);
+      font-family: Arial, sans-serif;
+      font-size: 0.83rem;
+      text-align: center;
+    }
+
+    .hint span {
+      color: var(--rose);
+    }
+
+    dialog {
+      width: min(calc(100% - 32px), 480px);
+      max-height: min(90vh, 850px);
+      padding: 0;
+      overflow: auto;
+      border: 1px solid #f2e3e1;
+      border-radius: 22px;
+      background: var(--paper);
+      color: var(--ink);
+      box-shadow: 0 25px 80px rgb(65 37 46 / 25%);
+    }
+
+    dialog::backdrop {
+      background: rgb(57 37 43 / 48%);
+      backdrop-filter: blur(4px);
+    }
+
+    .message-card {
+      position: relative;
+      padding: 24px;
+    }
+
+    .close-button {
+      position: absolute;
+      z-index: 1;
+      top: 12px;
+      right: 12px;
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border: 1px solid rgb(255 255 255 / 70%);
+      border-radius: 50%;
+      background: rgb(255 253 251 / 92%);
+      color: var(--rose-dark);
+      cursor: pointer;
+      font-family: Arial, sans-serif;
+      font-size: 1.35rem;
+    }
+
+    .message-photo {
+      display: block;
+      width: 100%;
+      max-height: 48vh;
+      border-radius: 14px;
+      background: var(--rose-light);
+      object-fit: cover;
+    }
+
+    .message-date {
+      margin: 22px 0 10px;
+      color: var(--rose);
+      font-family: Arial, sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .message-text {
+      margin: 0;
+      font-size: 1.14rem;
+      line-height: 1.65;
+      white-space: pre-line;
+    }
+
+    .message-signoff {
+      margin: 20px 0 0;
+      color: var(--rose);
+      font-size: 1.1rem;
+      text-align: right;
+    }
+
+    @media (max-width: 420px) {
+      body {
+        padding: 24px 12px;
+      }
+
+      .weekdays,
+      .days {
+        gap: 3px;
+      }
+
+      .day {
+        font-size: 0.85rem;
+      }
+
+      .message-card {
+        padding: 18px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="intro">
+      <p class="eyebrow">23 de outubro — 19 de novembro</p>
+      <h1>Um carinho por dia <span aria-hidden="true">❤️</span></h1>
+      <p class="subtitle">Escolha um dia do nosso calendário e abra uma surpresa feita para você.</p>
+    </header>
+
+    <section class="calendar" aria-label="Calendário de mensagens carinhosas">
+      <div class="month-nav">
+        <button class="nav-button" id="previous-month" type="button" aria-label="Mês anterior">‹</button>
+        <h2 id="month-title" aria-live="polite"></h2>
+        <button class="nav-button" id="next-month" type="button" aria-label="Próximo mês">›</button>
+      </div>
+      <div class="weekdays" aria-hidden="true">
+        <span>seg</span><span>ter</span><span>qua</span><span>qui</span><span>sex</span><span>sáb</span><span>dom</span>
+      </div>
+      <div class="days" id="calendar-days"></div>
+      <p class="hint"><span>♥</span> Cada dia guarda uma mensagem e uma lembrança.</p>
+    </section>
+  </main>
+
+  <dialog id="message-dialog" aria-labelledby="message-date">
+    <article class="message-card">
+      <button class="close-button" id="close-dialog" type="button" aria-label="Fechar mensagem">×</button>
+      <img class="message-photo" id="message-photo" alt="Uma lembrança especial">
+      <p class="message-date" id="message-date"></p>
+      <p class="message-text" id="message-text"></p>
+      <p class="message-signoff">Com amor, para você ♥</p>
+    </article>
+  </dialog>
+
+  <script>
+    const year = 2026;
+    const start = new Date(year, 9, 23);
+    const end = new Date(year, 10, 19);
+    const monthNames = new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric" });
+    const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    });
+
+    const messages = [
+      "Se eu pudesse escolher uma pessoa para viver todos os meus dias, desde os mais felizes até os mais difíceis, eu escolheria você mil vezes, sem pensar duas vezes. Você é meu amor e minha escolha. 💗",
+      "Meu amor, espero que você nunca duvide do quanto é especial para mim. Você merece todo o amor, carinho e cuidado do mundo, e eu quero fazer o possível para te proporcionar tudo isso. 🫶🏻❤️",
+      "Queria poder te abraçar agora, te apertar bem forte e ficar ali por um tempão, sem precisar dizer nada. Porque, às vezes, estar pertinho de você já é tudo o que eu preciso para ficar bem. 🥹💞",
+      "Você tem um jeitinho único de melhorar meu dia sem nem perceber. Uma mensagem sua, sua voz ou simplesmente pensar em você já consegue colocar um sorriso no meu rosto. Meu coração é todinho seu! ❤️",
+      "Eu não prometo que todos os nossos dias serão perfeitos, mas prometo que quero continuar tentando fazer dar certo, aprendendo com você e cuidando do nosso amor. Você vale cada esforço. 💍💕",
+      "Meu lugar favorito não é um lugar específico, é onde eu posso estar com você. Pode ser fazendo qualquer coisa, até sem fazer nada, porque tudo fica melhor quando tenho sua companhia. 🏡❤️",
+      "Se você pudesse enxergar o tamanho do amor que sinto por você, entenderia por que eu fico tão feliz só de imaginar nosso futuro juntos. Quero viver tanta coisa bonita ao seu lado! 🥰",
+      "Hoje eu só quero agradecer por ter você na minha vida. Obrigado pelo carinho, pelos momentos, pelas risadas e por tudo que construímos. Você é muito mais importante para mim do que consigo explicar. ❤️",
+      "Meu amor, nunca se esqueça de que você não precisa ser forte o tempo inteiro. Quero ser alguém com quem você possa contar, descansar o coração e ser você mesma, sem medo de nada. 🫂💗",
+      "Eu amo os detalhes em você, até aqueles que talvez você nem perceba. Amo seu jeito, sua voz, seu sorriso e as pequenas coisas que fazem você ser exatamente quem é. Amo você por inteiro. 😍❤️",
+      "Fico imaginando quantas lembranças ainda vamos criar juntos, quantos lugares vamos conhecer e quantas histórias teremos para contar. Ainda temos tanta coisa linda para viver, meu amor! ✨💞",
+      "Se hoje estiver sendo um dia difícil, lembra que existe alguém aqui torcendo pela sua felicidade, querendo ver você sorrir e sentindo um orgulho enorme da pessoa que você é. Eu te amo! ❤️",
+      "Você é aquela pessoa com quem quero compartilhar minhas conquistas, meus planos bobos, minhas preocupações e até as coisas mais simples do meu dia. Quero que você faça parte de tudo. 💕",
+      "Eu amo quando penso em nós e percebo que, além de namorada, você é alguém com quem quero construir uma história de verdade. Quero continuar escolhendo você, inclusive nos dias em que a vida não facilitar. 🥹❤️",
+      "Queria que você pudesse sentir o abraço que estou te mandando por essa mensagem. Um abraço demorado, cheio de saudade, carinho e daquele amor que só aumenta dentro de mim. 🫂💕",
+      "Meu bem, você não precisa fazer nada extraordinário para me conquistar. Seu jeito de existir, sendo você mesma, já é suficiente para me fazer apaixonar por você tantas vezes. ❤️",
+      "Uma das coisas que mais quero é ver você realizando seus sonhos e ficando cada vez mais feliz. Quero comemorar suas vitórias, te apoiar nos desafios e estar ao seu lado em cada etapa. 🥰",
+      "Às vezes, tudo o que eu queria era parar o tempo quando estou com você. Aproveitar mais um pouquinho seu abraço, seu sorriso e aquela sensação boa de que, naquele momento, está tudo bem. 💗",
+      "Meu amor, mesmo quando a distância ou a rotina atrapalham, quero que você saiba que meu carinho por você continua aqui. Você está presente nos meus pensamentos e nos planos que faço para nós. ❤️‍🩹💕",
+      "Eu quero conhecer todas as suas versões: a que ri de tudo, a que fica quietinha, a que está cansada, a que está animada e até a que precisa de colo. Quero amar você em todas elas. 🫶🏻",
+      "Falta pouco para a gente se ver, e só de pensar nisso meu coração já fica diferente. Estou contando os dias para poder trocar essas mensagens por abraços, beijos e momentos juntinhos com você. 🥹❤️",
+      "Se eu pudesse te dar um presente agora, seria a oportunidade de se enxergar pelos meus olhos. Assim você veria o quanto é linda, especial e capaz de despertar um amor tão grande em alguém. 😍💕",
+      "Meu amor, quero que a nossa história seja feita de respeito, parceria, carinho e muita cumplicidade. Quero que a gente cresça junto, aprenda junto e nunca perca a vontade de cuidar um do outro. ❤️",
+      "Cada dia que passa é mais um dia perto de te encontrar, e eu fico imaginando a felicidade de finalmente te ter pertinho. Tem saudade que só um abraço da pessoa certa consegue resolver. 🫂💞",
+      "Você é uma das minhas maiores certezas em meio a tantas coisas incertas da vida. Não porque sei exatamente como será o futuro, mas porque sei que quero continuar construindo algo bonito com você. ❤️",
+      "Estamos cada vez mais perto do nosso encontro, meu amor! Quero aproveitar cada abraço, cada beijo, cada conversa e cada segundo ao seu lado. Que saudade de poder simplesmente ficar pertinho de você! 🥹💋",
+      "Falta só um dia para te ver! Nem sei explicar direito o quanto estou feliz e ansioso para esse momento. Quero te abraçar bem forte e fazer valer cada dia de saudade. Amanhã é nosso! ❤️😭",
+      "Chegou o dia, meu amor! ❤️ Finalmente vou poder trocar a saudade pelo seu abraço, as mensagens pelos seus beijinhos e a imaginação pela felicidade de estar com você. Que esse seja mais um capítulo lindo da nossa história. Eu te amo demais! 🥹💖"
+    ];
+
+    const images = [
+      "WhatsApp Image 2026-10-22 at 21.29.13.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.29.04.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.29.22.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.29.08.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.29.19.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.29.01.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.30.26.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.29.11.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.29.03.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.29.17.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.38.32.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.29.07.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.29.15.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.29.24.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.29.02.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.29.20.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.29.09.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.30.27.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.29.05.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.29.14.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.29.23.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.29.06.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.29.18.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.29.10.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.30.25.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.29.12.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.29.21.jpeg",
+      "WhatsApp Image 2026-10-22 at 21.29.16.jpeg"
+    ];
+
+    const monthTitle = document.querySelector("#month-title");
+    const daysContainer = document.querySelector("#calendar-days");
+    const previousButton = document.querySelector("#previous-month");
+    const nextButton = document.querySelector("#next-month");
+    const messageDialog = document.querySelector("#message-dialog");
+    const messageDate = document.querySelector("#message-date");
+    const messageText = document.querySelector("#message-text");
+    const messagePhoto = document.querySelector("#message-photo");
+    let visibleMonth = new Date(start.getFullYear(), start.getMonth(), 1);
+
+    function renderCalendar() {
+      const yearInView = visibleMonth.getFullYear();
+      const monthInView = visibleMonth.getMonth();
+      const firstWeekday = (new Date(yearInView, monthInView, 1).getDay() + 6) % 7;
+      const daysInMonth = new Date(yearInView, monthInView + 1, 0).getDate();
+
+      monthTitle.textContent = monthNames.format(visibleMonth);
+      daysContainer.replaceChildren();
+      previousButton.disabled = monthInView === start.getMonth();
+      nextButton.disabled = monthInView === end.getMonth();
+
+      for (let blank = 0; blank < firstWeekday; blank += 1) {
+        const empty = document.createElement("span");
+        empty.className = "empty-day";
+        empty.setAttribute("aria-hidden", "true");
+        daysContainer.append(empty);
+      }
+
+      for (let dayNumber = 1; dayNumber <= daysInMonth; dayNumber += 1) {
+        const date = new Date(yearInView, monthInView, dayNumber);
+        const dayButton = document.createElement("button");
+        const dayIndex = Math.round((date - start) / 86400000);
+        const available = date >= start && date <= end;
+        const isTravelDay = yearInView === 2026 && monthInView === 10 && dayNumber === 19;
+
+        dayButton.type = "button";
+        dayButton.className = "day";
+        dayButton.textContent = String(dayNumber);
+        dayButton.disabled = !available;
+
+        if (available) {
+          dayButton.classList.add("available");
+          dayButton.setAttribute(
+            "aria-label",
+            `${dateFormatter.format(date)}${isTravelDay ? " — dia da viagem" : ""} — abrir surpresa`
+          );
+          dayButton.addEventListener("click", () => openMessage(date, dayIndex));
+        }
+
+        if (isTravelDay) {
+          dayButton.classList.add("travel-day");
+          dayButton.title = "Dia da viagem";
+          const plane = document.createElement("span");
+          plane.className = "travel-indicator";
+          plane.setAttribute("aria-hidden", "true");
+          plane.textContent = "✈";
+          dayButton.append(plane);
+        }
+
+        daysContainer.append(dayButton);
+      }
+    }
+
+    function openMessage(date, dayIndex) {
+      const isLastDay = dayIndex === messages.length - 1;
+      const daysRemaining = messages.length - 1 - dayIndex;
+      const countdown = isLastDay
+        ? "Estou chegando para te buscar ❤️"
+        : `Faltam ${daysRemaining} dias para 19/11! ❤️`;
+      messageDate.textContent = dateFormatter.format(date);
+      messageText.textContent = `${messages[dayIndex]}\n\n${countdown}`;
+      messagePhoto.src = `./IMAGENS/${encodeURIComponent(images[dayIndex])}`;
+      messageDialog.showModal();
+    }
+
+    previousButton.addEventListener("click", () => {
+      visibleMonth = new Date(year, visibleMonth.getMonth() - 1, 1);
+      renderCalendar();
+    });
+
+    nextButton.addEventListener("click", () => {
+      visibleMonth = new Date(year, visibleMonth.getMonth() + 1, 1);
+      renderCalendar();
+    });
+
+    document.querySelector("#close-dialog").addEventListener("click", () => {
+      messageDialog.close();
+    });
+
+    renderCalendar();
+  </script>
+</body>
+</html>
